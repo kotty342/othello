@@ -3,78 +3,109 @@ use std::io;
 const BOARD_SIZE:usize = 8;
 
 #[derive(PartialEq,Debug, Clone, Copy)]
-enum Player{
-    WHITE,
-    BLUCK,
-}
-
-#[derive(PartialEq,Debug, Clone, Copy)]
-struct Piece{
-    player:Player,
-}
-
-#[derive(PartialEq,Debug, Clone, Copy)]
 enum Cell{
-    Empty,
-    Piece(Piece),
+    EMPTY,
+    BLUCK,
+    WHITE,
+    OUTSIDE,
 }
 
 struct Board{
-    cells:[[Cell;BOARD_SIZE];BOARD_SIZE],
+    cells:[[Cell;BOARD_SIZE+2];BOARD_SIZE+2],
 }
 
 struct Game{
     board : Board,
-    current_player: Player
+    current_player: Cell
 }
 
 impl Game {
     fn new() -> Self{
-        let mut tmp_board = [[Cell::Empty;BOARD_SIZE];BOARD_SIZE];
-        tmp_board[4][3] = Cell::Piece(Piece{player:Player::BLUCK});
-        tmp_board[3][3] = Cell::Piece(Piece{player:Player::WHITE});
-        tmp_board[3][4] = Cell::Piece(Piece{player:Player::BLUCK});
-        tmp_board[4][4] = Cell::Piece(Piece{player:Player::WHITE});
+        let mut tmp_board = [[Cell::EMPTY;BOARD_SIZE+2];BOARD_SIZE+2];
+        tmp_board[5][4] = Cell::BLUCK;
+        tmp_board[4][4] = Cell::WHITE;
+        tmp_board[4][5] = Cell::BLUCK;
+        tmp_board[5][5] = Cell::WHITE;
+        for i in 0..BOARD_SIZE+2{
+            tmp_board[i][0] = Cell::OUTSIDE;
+            tmp_board[i][BOARD_SIZE+1] = Cell::OUTSIDE;
+            tmp_board[0][i] = Cell::OUTSIDE;
+            tmp_board[BOARD_SIZE+1][i] = Cell::OUTSIDE;
+        }
 
         Game { 
             board : Board{cells : tmp_board},
-            current_player: Player::BLUCK
+            current_player: Cell::BLUCK
         }
     }
 
     fn display(&self){
-        println!("   0 1 2 3 4 5 6 7");
+        println!("  0 1 2 3 4 5 6 7");
         println!(" +----------------+");
-        for y in 0..BOARD_SIZE{
-            print!("{}|",y);
-            for x in 0..BOARD_SIZE{
-                let cell = match self.board.cells[x][y]{
-                    Cell::Empty => "/",
-                    Cell::Piece(Piece{player:Player::BLUCK}) => "B",
-                    Cell::Piece(Piece{player:Player::WHITE}) => "W",
+        for y in 1..BOARD_SIZE+1{
+            print!("{}|",y-1);
+            for x in 1..BOARD_SIZE+1{
+                match self.board.cells[x][y]{
+                    Cell::EMPTY => print!("/ "),
+                    Cell::BLUCK => print!("B "),
+                    Cell::WHITE => print!("W "),
+                    Cell::OUTSIDE =>continue
                 };
-                print!(" {}",cell);
             }
             println!("|")
         }
         println!(" +----------------+");
     }
+    
+     //d:up and down in x direction up: ture    e:left and right in y direction right: true
+    fn chack(&mut self, p :usize, q :usize, d:isize,e:isize)-> usize{
+        let mut i = 1;
+
+        while self.board.cells[(p as isize +i*d )as usize][(q as isize + i*e) as usize] as usize == (3-self.current_player as usize){
+            i+=1;
+        }
+
+        if &self.board.cells[(p as isize +i*d )as usize][(q as isize + i*e) as usize] == &self.current_player{
+                return i as usize -1 as usize
+        }else {
+            return 0;
+        }
+    }
+
+    fn suitability(&mut self, x :usize, y :usize)-> bool{
+        if self.board.cells[x][y] == Cell::EMPTY{
+            for d in -1..=1{
+                for e in -1..=1{
+                    if self.chack(x, y, d, e) > 0{
+                        return true
+                    }else {
+                        continue
+                    }
+                }
+            }
+            return false
+        }
+        else {
+            return false;
+        }
+    }
 
     fn put(&mut self, x :usize, y :usize){
-        if self.board.cells[x][y] == Cell::Empty{
-            self.board.cells[x][y] = Cell::Piece(Piece{player:self.current_player});
+        if self.suitability(x, y){
+            self.board.cells[x][y] = self.current_player;
+            self.change_player()
         }
         else{
-            println!{"Occupied"};
+            println!{"illegal!"};
         }
     }
 
     fn change_player(&mut self){
-        if self.current_player == Player::WHITE{
-            self.current_player = Player::BLUCK
+        if self.current_player == Cell::WHITE{
+            self.current_player = Cell::BLUCK
         }
         else{
-            self.current_player = Player::WHITE
+            self.current_player = Cell::WHITE
         }
     }
 
@@ -82,16 +113,16 @@ impl Game {
         loop{
             self.display();
             match self.current_player{
-                Player::BLUCK => println!("BLUCK have a tuen"),
-                Player::WHITE => println!("WHITE have a tuen"),
+                Cell::BLUCK => println!("BLUCK have a tuen"),
+                Cell::WHITE => println!("WHITE have a tuen"),
+                _ => {println!("Err");break}
             };
             println!("where do you put?");
             println!("Vertical:");
             let vertical = std_imput();
             println!("horizontal:");
             let horizontal = std_imput();
-            self.put(vertical,horizontal);
-            self.change_player()
+            self.put(vertical+1,horizontal+1);
         }
     }
 }
@@ -112,5 +143,5 @@ fn std_imput()-> usize {
 
 fn main() {
     let mut new_game=Game::new();
-    new_game.main_loop()    
+    new_game.main_loop();
 }
