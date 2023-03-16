@@ -1,17 +1,19 @@
+use std::io;
+
 const BOARD_SIZE:usize = 8;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(PartialEq,Debug, Clone, Copy)]
 enum Player{
     WHITE,
     BLUCK,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(PartialEq,Debug, Clone, Copy)]
 struct Piece{
     player:Player,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(PartialEq,Debug, Clone, Copy)]
 enum Cell{
     Empty,
     Piece(Piece),
@@ -57,10 +59,47 @@ impl Game {
         }
         println!(" +----------------+");
     }
+
+    fn put(&mut self, x :usize, y :usize){
+        if  self.board.cells[x][y] == Cell::Empty{
+        self.board.cells[x][y] = Cell::Piece(Piece{player:self.current_player});
+        }else{
+            println!{"Err"};
+        }
+    }
+
+    fn main_loop(&mut self){
+        loop{
+            self.display();
+            match self.current_player{
+                Player::BLUCK => println!("BLUCK have a tuen"),
+                Player::WHITE => println!("WHITE have a tuen"),
+            };
+            println!("where do you put?");
+            println!("Vertical:");
+            let vertical = std_imput();
+            println!("horizontal:");
+            let horizontal = std_imput();
+            self.put(vertical,horizontal);
+        }
+    }
+}
+
+fn std_imput()-> usize {
+    loop{
+    let mut imput = String::new();
+    io::stdin()
+    .read_line(&mut imput)
+    .expect("Failed to read line");
+    let imput: usize = match imput.trim().parse() {
+        Ok(num) => num,
+        Err(_) => continue,
+        };
+        return imput
+    }
 }
 
 fn main() {
-    let Game = Game::new();
-    Game.display()
-    
+    let mut new_game=Game::new();
+    new_game.main_loop()    
 }
