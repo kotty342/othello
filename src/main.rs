@@ -57,7 +57,6 @@ impl Game {
         println!(" +----------------+");
     }
     
-     //d:up and down in x direction up: ture    e:left and right in y direction right: true
     fn chack(&mut self, p :usize, q :usize, d:isize,e:isize)-> usize{
         let mut i = 1;
 
@@ -66,7 +65,7 @@ impl Game {
         }
 
         if &self.board.cells[(p as isize +i*d )as usize][(q as isize + i*e) as usize] == &self.current_player{
-                return i as usize -1 as usize
+                return i as usize - 1
         }else {
             return 0;
         }
@@ -92,6 +91,16 @@ impl Game {
 
     fn put(&mut self, x :usize, y :usize){
         if self.suitability(x, y){
+            for d in -1..=1{
+                for e in -1..=1{
+                    let count = self.chack(x, y, d, e);
+                    let mut i:isize = 1;
+                    while i  <= count as isize{
+                        self.board.cells[(x as isize + i*d)as usize][(y as isize + i*e)as usize] = self.current_player;
+                        i+=1;
+                    }
+                }
+            }
             self.board.cells[x][y] = self.current_player;
             self.change_player()
         }
