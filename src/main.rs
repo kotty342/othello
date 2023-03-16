@@ -61,10 +61,20 @@ impl Game {
     }
 
     fn put(&mut self, x :usize, y :usize){
-        if  self.board.cells[x][y] == Cell::Empty{
-        self.board.cells[x][y] = Cell::Piece(Piece{player:self.current_player});
-        }else{
-            println!{"Err"};
+        if self.board.cells[x][y] == Cell::Empty{
+            self.board.cells[x][y] = Cell::Piece(Piece{player:self.current_player});
+        }
+        else{
+            println!{"Occupied"};
+        }
+    }
+
+    fn change_player(&mut self){
+        if self.current_player == Player::WHITE{
+            self.current_player = Player::BLUCK
+        }
+        else{
+            self.current_player = Player::WHITE
         }
     }
 
@@ -81,6 +91,7 @@ impl Game {
             println!("horizontal:");
             let horizontal = std_imput();
             self.put(vertical,horizontal);
+            self.change_player()
         }
     }
 }
