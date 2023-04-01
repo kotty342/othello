@@ -40,10 +40,10 @@ impl Game {
     }
 
     fn display(&self){
-        println!("  0 1 2 3 4 5 6 7");
-        println!(" +----------------+");
+        println!("   0 1 2 3 4 5 6 7");
+        println!(" +-----------------+");
         for y in 1..BOARD_SIZE+1{
-            print!("{}|",y-1);
+            print!("{}| ",y-1);
             for x in 1..BOARD_SIZE+1{
                 match self.board.cells[x][y]{
                     Cell::EMPTY => print!("/ "),
@@ -54,7 +54,7 @@ impl Game {
             }
             println!("|")
         }
-        println!(" +----------------+");
+        println!(" +-----------------+");
     }
     
     fn chack(&mut self, p :usize, q :usize, d:isize,e:isize)-> usize{
@@ -122,8 +122,8 @@ impl Game {
         loop{
             self.display();
             match self.current_player{
-                Cell::BLUCK => println!("BLUCK have a tuen"),
-                Cell::WHITE => println!("WHITE have a tuen"),
+                Cell::BLUCK => println!("BLUCK have a turn"),
+                Cell::WHITE => println!("WHITE have a turn"),
                 _ => {println!("Err");break}
             };
             println!("where do you put?");
