@@ -1,3 +1,5 @@
+#fork
+
 use std::io;
 
 const BOARD_SIZE:usize = 8;
